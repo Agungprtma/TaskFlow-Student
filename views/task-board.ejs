@@ -1,0 +1,184 @@
+<!-- views/task-board.ejs -->
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Task Board - TaskFocus Student</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+    <!-- Google Analytics 4 -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=<%= ga4_id %>"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "<%= ga4_id %>");
+    </script>
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="navbar">
+      <div class="container">
+        <div class="navbar-content">
+          <div class="navbar-brand">
+            <h1>TaskFocus Student</h1>
+          </div>
+          <ul class="navbar-menu">
+            <li><a href="/dashboard/<%= user.id %>" class="btn btn-sm">Dashboard</a></li>
+            <li><a href="/tasks/new/<%= user.id %>" class="btn btn-sm btn-primary">Tambah Tugas</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="task-board-container">
+      <div class="container">
+        <h2>📋 Kelola Tugas Anda</h2>
+        <p class="board-subtitle">Seret dan letakkan tugas antar kolom untuk mengubah statusnya.</p>
+
+        <div class="task-board">
+          <!-- Belum Mulai Column -->
+          <div class="board-column">
+            <div class="column-header">
+              <h3>Belum Mulai</h3>
+              <span class="task-count"><%= tasksByStatus.belum_mulai.length %></span>
+            </div>
+            <div class="task-list" id="belum_mulai" data-status="belum_mulai">
+              <% tasksByStatus.belum_mulai.forEach(task => { %>
+              <div class="task-card" draggable="true" data-task-id="<%= task.id %>" data-status="<%= task.status %>">
+                <div class="task-header">
+                  <h5><%= task.title %></h5>
+                  <div class="priority-badge <%= task.priorityCategory %>">
+                    <%= task.priorityCategory.replace(/_/g, " ").toUpperCase().substring(0, 2) %>
+                  </div>
+                </div>
+
+                <p class="task-course"><%= task.courseName %></p>
+
+                <div class="task-meta">
+                  <span class="task-deadline">
+                    📅 <%= new Date(task.deadline).toLocaleDateString("id-ID") %>
+                  </span>
+                  <span class="task-time">
+                    ⏱️ <%= task.estimatedHours %>h
+                  </span>
+                </div>
+
+                <p class="task-reason"><strong>Prioritas:</strong> <%= task.priorityReason.substring(0, 80) %>...</p>
+
+                <div class="task-actions">
+                  <a href="/focus/<%= task.id %>?userId=<%= user.id %>" class="btn-icon btn-small" title="Mulai Sesi Fokus">
+                    ⏱️
+                  </a>
+                  <button class="btn-icon btn-small" onclick="deleteTask('<%= task.id %>')" title="Hapus">
+                    🗑️
+                  </button>
+                </div>
+              </div>
+              <% }); %>
+
+              <% if (tasksByStatus.belum_mulai.length === 0) { %>
+              <div class="empty-column">
+                <p>Tidak ada tugas yang belum dimulai</p>
+              </div>
+              <% } %>
+            </div>
+          </div>
+
+          <!-- Sedang Dikerjakan Column -->
+          <div class="board-column">
+            <div class="column-header">
+              <h3>Sedang Dikerjakan</h3>
+              <span class="task-count"><%= tasksByStatus.sedang_dikerjakan.length %></span>
+            </div>
+            <div class="task-list" id="sedang_dikerjakan" data-status="sedang_dikerjakan">
+              <% tasksByStatus.sedang_dikerjakan.forEach(task => { %>
+              <div class="task-card" draggable="true" data-task-id="<%= task.id %>" data-status="<%= task.status %>">
+                <div class="task-header">
+                  <h5><%= task.title %></h5>
+                  <div class="priority-badge <%= task.priorityCategory %>">
+                    <%= task.priorityCategory.replace(/_/g, " ").toUpperCase().substring(0, 2) %>
+                  </div>
+                </div>
+
+                <p class="task-course"><%= task.courseName %></p>
+
+                <div class="task-meta">
+                  <span class="task-deadline">
+                    📅 <%= new Date(task.deadline).toLocaleDateString("id-ID") %>
+                  </span>
+                  <span class="task-time">
+                    ⏱️ <%= task.estimatedHours %>h
+                  </span>
+                </div>
+
+                <p class="task-reason"><strong>Aksi:</strong> <%= task.actionRecommendation.substring(0, 60) %>...</p>
+
+                <div class="task-actions">
+                  <a href="/focus/<%= task.id %>?userId=<%= user.id %>" class="btn-icon btn-small" title="Mulai Sesi Fokus">
+                    ⏱️
+                  </a>
+                  <button class="btn-icon btn-small" onclick="deleteTask('<%= task.id %>')" title="Hapus">
+                    🗑️
+                  </button>
+                </div>
+              </div>
+              <% }); %>
+
+              <% if (tasksByStatus.sedang_dikerjakan.length === 0) { %>
+              <div class="empty-column">
+                <p>Mulai seret tugas ke sini</p>
+              </div>
+              <% } %>
+            </div>
+          </div>
+
+          <!-- Selesai Column -->
+          <div class="board-column">
+            <div class="column-header">
+              <h3>Selesai</h3>
+              <span class="task-count"><%= tasksByStatus.selesai.length %></span>
+            </div>
+            <div class="task-list" id="selesai" data-status="selesai">
+              <% tasksByStatus.selesai.forEach(task => { %>
+              <div class="task-card completed" draggable="true" data-task-id="<%= task.id %>" data-status="<%= task.status %>">
+                <div class="task-header">
+                  <h5><%= task.title %></h5>
+                  <span class="completed-badge">✓</span>
+                </div>
+
+                <p class="task-course"><%= task.courseName %></p>
+
+                <div class="task-meta">
+                  <span class="task-deadline">
+                    📅 <%= new Date(task.deadline).toLocaleDateString("id-ID") %>
+                  </span>
+                </div>
+
+                <div class="task-actions">
+                  <button class="btn-icon btn-small" onclick="deleteTask('<%= task.id %>')" title="Hapus">
+                    🗑️
+                  </button>
+                </div>
+              </div>
+              <% }); %>
+
+              <% if (tasksByStatus.selesai.length === 0) { %>
+              <div class="empty-column">
+                <p>Selesaikan tugas untuk melihatnya di sini</p>
+              </div>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="/js/task-board.js"></script>
+  </body>
+</html>

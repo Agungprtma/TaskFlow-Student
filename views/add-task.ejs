@@ -1,0 +1,161 @@
+<!-- views/add-task.ejs -->
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tambah Tugas - TaskFocus Student</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="navbar">
+      <div class="container">
+        <div class="navbar-content">
+          <div class="navbar-brand">
+            <h1>TaskFocus Student</h1>
+          </div>
+          <ul class="navbar-menu">
+            <li><a href="/dashboard/<%= user.id %>" class="btn btn-sm">Dashboard</a></li>
+            <li><a href="/tasks/board/<%= user.id %>" class="btn btn-sm">Kelola Tugas</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="form-container">
+      <div class="container">
+        <div class="form-box">
+          <h2>Tambah Tugas Baru</h2>
+          <p class="form-subtitle">Masukkan detail tugas agar sistem dapat menghitung prioritasnya secara otomatis.</p>
+
+          <form id="task-form" class="task-form">
+            <!-- Identitas Tugas -->
+            <fieldset>
+              <legend>Identitas Tugas</legend>
+
+              <div class="form-group">
+                <label for="title">Nama Tugas *</label>
+                <input type="text" id="title" name="title" placeholder="Contoh: Membuat Laporan Akhir Semester" required />
+              </div>
+
+              <div class="form-group">
+                <label for="courseName">Mata Kuliah *</label>
+                <input type="text" id="courseName" name="courseName" placeholder="Contoh: Sistem Basis Data" required />
+              </div>
+
+              <div class="form-group">
+                <label for="deadline">Deadline *</label>
+                <input type="datetime-local" id="deadline" name="deadline" required />
+              </div>
+            </fieldset>
+
+            <!-- Karakteristik Tugas -->
+            <fieldset>
+              <legend>Karakteristik Tugas</legend>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="difficultyLevel">Tingkat Kesulitan *</label>
+                  <select id="difficultyLevel" name="difficultyLevel" required>
+                    <option value="">Pilih tingkat kesulitan</option>
+                    <option value="rendah">Rendah (mudah diselesaikan)</option>
+                    <option value="sedang">Sedang (butuh usaha normal)</option>
+                    <option value="tinggi">Tinggi (kompleks dan menantang)</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="importanceLevel">Tingkat Kepentingan *</label>
+                  <select id="importanceLevel" name="importanceLevel" required>
+                    <option value="">Pilih tingkat kepentingan</option>
+                    <option value="rendah">Rendah (opsional atau extra credit)</option>
+                    <option value="sedang">Sedang (penting untuk nilai)</option>
+                    <option value="tinggi">Tinggi (sangat penting untuk nilai)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="estimatedHours">Estimasi Waktu Pengerjaan (jam) *</label>
+                <input type="number" id="estimatedHours" name="estimatedHours" min="0.5" step="0.5" placeholder="Contoh: 3" required />
+              </div>
+            </fieldset>
+
+            <!-- Actions -->
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary btn-full">Tambah Tugas & Lihat Prioritas</button>
+              <a href="/tasks/board/<%= user.id %>" class="btn btn-secondary btn-full">Batal</a>
+            </div>
+
+            <p class="form-message" id="form-message"></p>
+          </form>
+
+          <!-- Info Box -->
+          <div class="info-box">
+            <h4>💡 Bagaimana Prioritas Dihitung?</h4>
+            <p>
+              TaskFocus menghitung skor prioritas berdasarkan deadline, tingkat kesulitan, estimasi waktu, dan
+              kepentingan. Tugas dengan skor lebih tinggi akan ditampilkan lebih dulu di dashboard.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.getElementById("task-form").addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        const formData = {
+          userId: "<%= user.id %>",
+          title: document.getElementById("title").value,
+          courseName: document.getElementById("courseName").value,
+          deadline: document.getElementById("deadline").value,
+          difficultyLevel: document.getElementById("difficultyLevel").value,
+          importanceLevel: document.getElementById("importanceLevel").value,
+          estimatedHours: document.getElementById("estimatedHours").value,
+        };
+
+        try {
+          const response = await fetch("/tasks/create", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formData),
+          });
+
+          const data = await response.json();
+
+          if (response.ok && data.success) {
+            // Track GA4 event
+            gtag("event", "task_create", {
+              task_id: data.task.id,
+              priority_category: data.task.priorityCategory,
+              priority_score: data.task.priorityScore,
+              estimated_hours: formData.estimatedHours,
+            });
+
+            // Redirect to task board
+            window.location.href = `/tasks/board/<%= user.id %>`;
+          } else {
+            const messageEl = document.getElementById("form-message");
+            messageEl.textContent = data.error || "Terjadi kesalahan";
+            messageEl.classList.add("error");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          const messageEl = document.getElementById("form-message");
+          messageEl.textContent = "Terjadi kesalahan jaringan";
+          messageEl.classList.add("error");
+        }
+      });
+
+      // Set min datetime to now
+      const now = new Date();
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+      document.getElementById("deadline").min = now.toISOString().slice(0, 16);
+    </script>
+  </body>
+</html>

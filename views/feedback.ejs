@@ -1,0 +1,200 @@
+<!-- views/feedback.ejs -->
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Feedback - TaskFocus Student</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+    <!-- Google Analytics 4 -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-XXXXXXXXXX");
+    </script>
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="navbar">
+      <div class="container">
+        <div class="navbar-content">
+          <div class="navbar-brand">
+            <h1>TaskFocus Student</h1>
+          </div>
+          <ul class="navbar-menu">
+            <li><a href="/dashboard/<%= user.id %>" class="btn btn-sm">Dashboard</a></li>
+            <li><a href="/tasks/board/<%= user.id %>" class="btn btn-sm">Kelola Tugas</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="form-container">
+      <div class="container">
+        <div class="form-box">
+          <h2>Feedback Anda Sangat Berharga</h2>
+          <p class="form-subtitle">
+            Bantu kami meningkatkan TaskFocus Student dengan memberikan feedback tentang pengalaman Anda.
+          </p>
+
+          <form id="feedback-form" class="feedback-form">
+            <fieldset>
+              <legend>Pengalaman dengan Fitur Rekomendasi Prioritas</legend>
+
+              <div class="form-group">
+                <label>Seberapa relevan rekomendasi prioritas dengan kebutuhan Anda? *</label>
+                <div class="rating-group">
+                  <% for (let i = 1; i <= 5; i++) { %>
+                  <label class="rating-label">
+                    <input type="radio" name="relevanceScore" value="<%= i %>" required />
+                    <span class="rating-star">
+                      <% if (i <= 2) { %>
+                      😟
+                      <% } else if (i === 3) { %>
+                      😐
+                      <% } else { %>
+                      😊
+                      <% } %>
+                    </span>
+                    <span class="rating-text"><%= i %></span>
+                  </label>
+                  <% } %>
+                </div>
+                <small>1 = Tidak relevan sama sekali, 5 = Sangat relevan</small>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend>Pengalaman dengan Fitur Sesi Fokus</legend>
+
+              <div class="form-group">
+                <label>Seberapa membantu fitur sesi fokus untuk mempertahankan konsentrasi? *</label>
+                <div class="rating-group">
+                  <% for (let i = 1; i <= 5; i++) { %>
+                  <label class="rating-label">
+                    <input type="radio" name="focusHelpfulnessScore" value="<%= i %>" required />
+                    <span class="rating-star">
+                      <% if (i <= 2) { %>
+                      😟
+                      <% } else if (i === 3) { %>
+                      😐
+                      <% } else { %>
+                      😊
+                      <% } %>
+                    </span>
+                    <span class="rating-text"><%= i %></span>
+                  </label>
+                  <% } %>
+                </div>
+                <small>1 = Tidak membantu, 5 = Sangat membantu</small>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend>Komitmen Penggunaan</legend>
+
+              <div class="form-group">
+                <label>Apakah Anda bersedia menggunakan TaskFocus Student minimal 1 kali seminggu? *</label>
+                <div class="checkbox-group">
+                  <label class="checkbox-label">
+                    <input type="radio" name="weeklyUsageIntent" value="Ya" required />
+                    <span>Ya, pasti akan menggunakannya</span>
+                  </label>
+                  <label class="checkbox-label">
+                    <input type="radio" name="weeklyUsageIntent" value="Mungkin" />
+                    <span>Mungkin, tergantung kebutuhan</span>
+                  </label>
+                  <label class="checkbox-label">
+                    <input type="radio" name="weeklyUsageIntent" value="Tidak" />
+                    <span>Tidak</span>
+                  </label>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend>Saran Perbaikan</legend>
+
+              <div class="form-group">
+                <label for="suggestion">Ada saran atau fitur yang ingin Anda tambahkan?</label>
+                <textarea
+                  id="suggestion"
+                  name="improvementSuggestion"
+                  rows="5"
+                  placeholder="Bagikan ide atau saran Anda di sini..."
+                ></textarea>
+              </div>
+            </fieldset>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary btn-full">Kirim Feedback</button>
+              <a href="/dashboard/<%= user.id %>" class="btn btn-secondary btn-full">Kembali ke Dashboard</a>
+            </div>
+
+            <p class="form-message" id="form-message"></p>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.getElementById("feedback-form").addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        const formData = {
+          userId: "<%= user.id %>",
+          relevanceScore: document.querySelector('input[name="relevanceScore"]:checked').value,
+          focusHelpfulnessScore: document.querySelector('input[name="focusHelpfulnessScore"]:checked').value,
+          weeklyUsageIntent: document.querySelector('input[name="weeklyUsageIntent"]:checked').value,
+          improvementSuggestion: document.getElementById("suggestion").value,
+        };
+
+        try {
+          const response = await fetch("/feedback/submit", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formData),
+          });
+
+          const data = await response.json();
+
+          if (response.ok && data.success) {
+            // Track GA4 event
+            gtag("event", "feedback_submit", {
+              relevance_score: parseInt(formData.relevanceScore),
+              focus_helpfulness_score: parseInt(formData.focusHelpfulnessScore),
+              weekly_usage_intent: formData.weeklyUsageIntent,
+            });
+
+            const messageEl = document.getElementById("form-message");
+            messageEl.textContent = data.message;
+            messageEl.classList.add("success");
+
+            // Redirect after 2 seconds
+            setTimeout(() => {
+              window.location.href = `/dashboard/<%= user.id %>`;
+            }, 2000);
+          } else {
+            const messageEl = document.getElementById("form-message");
+            messageEl.textContent = data.error || "Terjadi kesalahan";
+            messageEl.classList.add("error");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          const messageEl = document.getElementById("form-message");
+          messageEl.textContent = "Terjadi kesalahan jaringan";
+          messageEl.classList.add("error");
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,154 @@
+<!-- views/onboarding.ejs -->
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Onboarding - TaskFocus Student</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+    <!-- Google Analytics 4 -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=<%= ga4_id %>"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "<%= ga4_id %>");
+    </script>
+  </head>
+  <body>
+    <div class="onboarding-container">
+      <div class="onboarding-box">
+        <h2>Selamat Datang di TaskFocus Student</h2>
+        <p class="onboarding-subtitle">Kami ingin mengenal Anda lebih baik untuk memberikan pengalaman terbaik.</p>
+
+        <form id="onboarding-form" class="onboarding-form">
+          <!-- Basic Info -->
+          <div class="form-group">
+            <label for="name">Nama Anda *</label>
+            <input type="text" id="name" name="name" required />
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email *</label>
+            <input type="email" id="email" name="email" required />
+          </div>
+
+          <!-- Education Info -->
+          <div class="form-group">
+            <label for="educationLevel">Status Pendidikan *</label>
+            <select id="educationLevel" name="educationLevel" required>
+              <option value="">Pilih status pendidikan</option>
+              <option value="S1">S1 (Sarjana)</option>
+              <option value="S2">S2 (Magister)</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="semester">Semester Saat Ini *</label>
+              <input type="number" id="semester" name="semester" min="1" max="14" required />
+            </div>
+
+            <div class="form-group">
+              <label for="avgTasksPerWeek">Rata-rata Tugas/Minggu *</label>
+              <input type="number" id="avgTasksPerWeek" name="avgTasksPerWeek" min="1" max="50" required value="5" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="studyProgram">Program Studi *</label>
+            <input type="text" id="studyProgram" name="studyProgram" placeholder="Contoh: Teknik Informatika" required />
+          </div>
+
+          <!-- Pain Point -->
+          <div class="form-group">
+            <label for="mainPainPoint">Kesulitan Utama yang Dihadapi *</label>
+            <div class="checkbox-group">
+              <label class="checkbox-label">
+                <input type="radio" name="mainPainPoint" value="sulit_prioritas" required />
+                <span>Sulit menentukan prioritas</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="radio" name="mainPainPoint" value="sulit_fokus" />
+                <span>Sulit fokus saat belajar</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="radio" name="mainPainPoint" value="deadline_menumpuk" />
+                <span>Deadline yang menumpuk</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="radio" name="mainPainPoint" value="kurang_motivasi" />
+                <span>Kurang motivasi</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="radio" name="mainPainPoint" value="distraksi_digital" />
+                <span>Distraksi digital</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="radio" name="mainPainPoint" value="lainnya" />
+                <span>Lainnya</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <button type="submit" class="btn btn-primary btn-full">Mulai Menggunakan TaskFocus</button>
+          </div>
+
+          <p class="form-message" id="form-message"></p>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      document.getElementById("onboarding-form").addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        const formData = {
+          name: document.getElementById("name").value,
+          email: document.getElementById("email").value,
+          educationLevel: document.getElementById("educationLevel").value,
+          semester: document.getElementById("semester").value,
+          studyProgram: document.getElementById("studyProgram").value,
+          avgTasksPerWeek: document.getElementById("avgTasksPerWeek").value,
+          mainPainPoint: document.querySelector('input[name="mainPainPoint"]:checked').value,
+        };
+
+        try {
+          const response = await fetch("/onboarding/submit", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formData),
+          });
+
+          const data = await response.json();
+
+          if (response.ok && data.success) {
+            // Track GA4 event
+            gtag("event", "onboarding_submit", {
+              education_level: formData.educationLevel,
+              main_pain_point: formData.mainPainPoint,
+            });
+
+            // Redirect to dashboard
+            window.location.href = `/dashboard/${data.userId}`;
+          } else {
+            document.getElementById("form-message").textContent = data.error || "Terjadi kesalahan";
+            document.getElementById("form-message").classList.add("error");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          document.getElementById("form-message").textContent = "Terjadi kesalahan jaringan";
+          document.getElementById("form-message").classList.add("error");
+        }
+      });
+    </script>
+  </body>
+</html>

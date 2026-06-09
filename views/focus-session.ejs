@@ -1,0 +1,253 @@
+<!-- views/focus-session.ejs -->
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sesi Fokus - TaskFocus Student</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+    <!-- Google Analytics 4 -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=<%= ga4_id %>"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "<%= ga4_id %>");
+    </script>
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="navbar">
+      <div class="container">
+        <div class="navbar-content">
+          <div class="navbar-brand">
+            <h1>TaskFocus Student</h1>
+          </div>
+          <ul class="navbar-menu">
+            <li><a href="/dashboard/<%= user.id %>" class="btn btn-sm">Dashboard</a></li>
+            <li><a href="/tasks/board/<%= user.id %>" class="btn btn-sm">Kelola Tugas</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="focus-session-container">
+      <div class="container">
+        <div class="focus-box">
+          <!-- Task Info -->
+          <div class="task-info-card">
+            <h3><%= task.title %></h3>
+            <p class="task-course"><%= task.courseName %></p>
+
+            <div class="task-details">
+              <div class="detail-item">
+                <span class="label">Deadline</span>
+                <span class="value"><%= new Date(task.deadline).toLocaleDateString("id-ID") %></span>
+              </div>
+              <div class="detail-item">
+                <span class="label">Estimasi</span>
+                <span class="value"><%= task.estimatedHours %> jam</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">Prioritas</span>
+                <span class="value <%= task.priorityCategory %>">
+                  <%= task.priorityCategory.replace(/_/g, " ").toUpperCase() %>
+                </span>
+              </div>
+            </div>
+
+            <p class="task-reason"><strong>Alasan Prioritas:</strong> <%= task.priorityReason %></p>
+            <p class="task-action"><strong>Rekomendasi:</strong> <%= task.actionRecommendation %></p>
+          </div>
+
+          <!-- Timer Section -->
+          <div class="timer-card">
+            <h2>Sesi Fokus Anda</h2>
+
+            <div class="timer-display">
+              <div class="time" id="timer">
+                <%= String(Math.floor(recommendedDuration / 60)).padStart(2, "0") %>:<%=
+                String(recommendedDuration % 60).padStart(2, "0") %>
+              </div>
+            </div>
+
+            <p class="recommended-text">
+              Waktu yang direkomendasikan: <%= recommendedDuration %> menit
+            </p>
+
+            <div class="timer-controls">
+              <button class="btn btn-primary" id="start-btn" onclick="startTimer()">Mulai</button>
+              <button class="btn btn-secondary" id="pause-btn" onclick="pauseTimer()" style="display: none">Jeda</button>
+              <button class="btn btn-secondary" id="resume-btn" onclick="resumeTimer()" style="display: none">Lanjut</button>
+              <button class="btn btn-secondary" id="reset-btn" onclick="resetTimer()">Reset</button>
+            </div>
+
+            <button class="btn btn-success btn-full" id="complete-btn" onclick="completeSession()" style="display: none">
+              Selesai! ✓
+            </button>
+
+            <a href="/tasks/board/<%= user.id %>" class="btn btn-secondary btn-full">Kembali ke Board</a>
+          </div>
+
+          <!-- Tips Section -->
+          <div class="tips-card">
+            <h4>💡 Tips Sesi Fokus yang Efektif</h4>
+            <ul>
+              <li>Matikan notifikasi dari ponsel atau aplikasi</li>
+              <li>Pilih tempat yang tenang untuk fokus</li>
+              <li>Minum air putih sebelum memulai</li>
+              <li>Pecah tugas besar menjadi bagian-bagian kecil</li>
+              <li>Setelah selesai, ambil istirahat singkat</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Timer state
+      let timeRemaining = <%= recommendedDuration %> * 60; // Convert to seconds
+      let timerInterval = null;
+      let isRunning = false;
+      let isPaused = false;
+      let sessionId = null;
+
+      function startTimer() {
+        if (!isRunning) {
+          isRunning = true;
+          isPaused = false;
+
+          // Create focus session in backend
+          createFocusSession();
+
+          // Update UI
+          document.getElementById("start-btn").style.display = "none";
+          document.getElementById("pause-btn").style.display = "inline-block";
+          document.getElementById("complete-btn").style.display = "block";
+
+          // Start the countdown
+          timerInterval = setInterval(updateTimer, 1000);
+
+          // Track GA4 event
+          gtag("event", "focus_session_start", {
+            task_id: "<%= task.id %>",
+            recommended_duration: <%= recommendedDuration %>,
+          });
+        }
+      }
+
+      function pauseTimer() {
+        isPaused = true;
+        clearInterval(timerInterval);
+        document.getElementById("pause-btn").style.display = "none";
+        document.getElementById("resume-btn").style.display = "inline-block";
+      }
+
+      function resumeTimer() {
+        isPaused = false;
+        document.getElementById("resume-btn").style.display = "none";
+        document.getElementById("pause-btn").style.display = "inline-block";
+        timerInterval = setInterval(updateTimer, 1000);
+      }
+
+      function resetTimer() {
+        clearInterval(timerInterval);
+        timeRemaining = <%= recommendedDuration %> * 60;
+        isRunning = false;
+        isPaused = false;
+        updateTimerDisplay();
+
+        document.getElementById("start-btn").style.display = "inline-block";
+        document.getElementById("pause-btn").style.display = "none";
+        document.getElementById("resume-btn").style.display = "none";
+        document.getElementById("complete-btn").style.display = "none";
+      }
+
+      function updateTimer() {
+        timeRemaining--;
+        updateTimerDisplay();
+
+        if (timeRemaining <= 0) {
+          clearInterval(timerInterval);
+          completeSession();
+        }
+      }
+
+      function updateTimerDisplay() {
+        const minutes = Math.floor(timeRemaining / 60);
+        const seconds = timeRemaining % 60;
+        document.getElementById("timer").textContent = `${String(minutes).padStart(2, "0")}:${String(
+          seconds
+        ).padStart(2, "0")}`;
+      }
+
+      async function createFocusSession() {
+        try {
+          const response = await fetch("/focus/start", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userId: "<%= userId %>",
+              taskId: "<%= task.id %>",
+            }),
+          });
+
+          const data = await response.json();
+          if (data.success) {
+            sessionId = data.session.id;
+          }
+        } catch (error) {
+          console.error("Error creating session:", error);
+        }
+      }
+
+      async function completeSession() {
+        clearInterval(timerInterval);
+
+        try {
+          const response = await fetch("/focus/complete", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              sessionId: sessionId,
+              taskId: "<%= task.id %>",
+            }),
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            // Track GA4 event
+            gtag("event", "focus_session_complete", {
+              task_id: "<%= task.id %>",
+              focus_duration: <%= recommendedDuration %>,
+            });
+
+            // Show success message and redirect
+            alert("Bagus sekali! Sesi fokus Anda selesai. 🎉");
+            window.location.href = `/dashboard/<%= user.id %>`;
+          }
+        } catch (error) {
+          console.error("Error completing session:", error);
+          alert("Terjadi kesalahan saat menyelesaikan sesi");
+        }
+      }
+
+      // Handle page unload to track abandoned sessions
+      window.addEventListener("beforeunload", function () {
+        if (isRunning && sessionId) {
+          navigator.sendBeacon("/focus/abandon", JSON.stringify({ sessionId: sessionId }));
+        }
+      });
+    </script>
+  </body>
+</html>
