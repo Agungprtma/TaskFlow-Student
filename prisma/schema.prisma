@@ -1,0 +1,106 @@
+// prisma/schema.prisma
+// Database schema for TaskFocus Student
+// Uses PostgreSQL database
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// User model - stores student profile and preferences
+model User {
+  id                  String   @id @default(cuid())
+  name                String
+  email               String   @unique
+  educationLevel      String   // S1 or S2
+  semester            Int      // Current semester
+  studyProgram        String   // Program studi
+  avgTasksPerWeek     Int      // Average tasks per week
+  mainPainPoint       String   // Main challenge: sulit prioritas, sulit fokus, deadline menumpuk, kurang motivasi, distraksi digital, lainnya
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  // Relations
+  tasks               Task[]
+  focusSessions       FocusSession[]
+  feedback            Feedback?
+
+  @@index([email])
+}
+
+// Task model - stores academic tasks/assignments
+model Task {
+  id                  String   @id @default(cuid())
+  userId              String
+  title               String   // Task name
+  courseName          String   // Course/class name
+  deadline            DateTime // Due date
+  difficultyLevel     String   // rendah (low), sedang (medium), tinggi (high)
+  estimatedHours      Float    // Estimated duration in hours
+  importanceLevel     String   // rendah (low), sedang (medium), tinggi (high)
+  priorityScore       Int      // Calculated priority score (0-140)
+  priorityCategory    String   // prioritas_tinggi, prioritas_sedang, prioritas_rendah
+  priorityReason      String   // Natural language explanation of why task has this priority
+  actionRecommendation String  // Recommended action (e.g., "Kerjakan hari ini")
+  status              String   @default("belum_mulai") // belum_mulai, sedang_dikerjakan, selesai
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  // Relations
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  focusSessions       FocusSession[]
+
+  @@index([userId])
+  @@index([deadline])
+  @@index([status])
+}
+
+// FocusSession model - stores focus/study session data
+model FocusSession {
+  id                  String   @id @default(cuid())
+  userId              String
+  taskId              String
+  recommendedDuration Int      // Recommended duration in minutes
+  startedAt           DateTime
+  endedAt             DateTime?
+  status              String   @default("in_progress") // in_progress, completed, abandoned
+  createdAt           DateTime @default(now())
+
+  // Relations
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  task                Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([taskId])
+}
+
+// Waitlist model - stores interested users for product updates
+model Waitlist {
+  id                  String   @id @default(cuid())
+  name                String
+  email               String   @unique
+  preferredFeature    String   // reminder_deadline, integrasi_kalender, dashboard_produktivitas, rekomendasi_ai, progress_report
+  createdAt           DateTime @default(now())
+
+  @@index([email])
+}
+
+// Feedback model - stores user feedback about features
+model Feedback {
+  id                  String   @id @default(cuid())
+  userId              String   @unique
+  relevanceScore      Int      // 1-5 scale: relevance of priority recommendations
+  focusHelpfulnessScore Int   // 1-5 scale: helpfulness of focus session feature
+  weeklyUsageIntent   String   // Ya, Tidak, Mungkin
+  improvementSuggestion String?
+  createdAt           DateTime @default(now())
+
+  // Relations
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Terjadi Kesalahan | TaskFocus Student</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+  <style>
+    .error-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem;
+      text-align: center;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .error-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+
+    .error-title {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .error-message {
+      font-size: 1.125rem;
+      margin-bottom: 2rem;
+      opacity: 0.9;
+      max-width: 500px;
+    }
+
+    .error-code {
+      background-color: rgba(0, 0, 0, 0.2);
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      font-family: 'Courier New', monospace;
+      font-size: 0.875rem;
+      word-break: break-all;
+    }
+
+    .error-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .error-actions .btn {
+      background-color: white;
+      color: #667eea;
+    }
+
+    .error-actions .btn:hover {
+      background-color: rgba(255, 255, 255, 0.9);
+    }
+  </style>
+</head>
+<body>
+  <div class="error-container">
+    <div class="error-icon">⚠️</div>
+    <h1 class="error-title">Terjadi Kesalahan</h1>
+    <p class="error-message">
+      Kami mengalami masalah saat memproses permintaan Anda. Silakan coba lagi
+      nanti atau hubungi tim support kami.
+    </p>
+
+    <% if (error && error.message) { %>
+    <div class="error-code">
+      <strong>Error:</strong>
+      <%= error.message %>
+    </div>
+    <% } %>
+
+    <div class="error-actions">
+      <a href="/" class="btn btn-primary">Kembali ke Beranda</a>
+      <button class="btn btn-secondary" onclick="window.history.back()">
+        Kembali
+      </button>
+    </div>
+  </div>
+</body>
+</html>

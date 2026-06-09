@@ -1,0 +1,209 @@
+<!-- views/dashboard.ejs -->
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - TaskFocus Student</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+    <!-- Google Analytics 4 -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=<%= ga4_id %>"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "<%= ga4_id %>");
+    </script>
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="navbar">
+      <div class="container">
+        <div class="navbar-content">
+          <div class="navbar-brand">
+            <h1>TaskFocus Student</h1>
+          </div>
+          <ul class="navbar-menu">
+            <li><span class="user-name"><%= user.name %></span></li>
+            <li><a href="/tasks/board/<%= user.id %>" class="btn btn-sm">Kelola Tugas</a></li>
+            <li><a href="/feedback/<%= user.id %>" class="btn btn-sm">Feedback</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="dashboard-container">
+      <div class="container">
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+          <h2>Selamat Datang, <%= user.name %>! 👋</h2>
+          <p>Hari ini adalah hari yang tepat untuk produktif. Yuk mulai dari tugas yang paling penting.</p>
+        </div>
+
+        <!-- Dashboard Summary Cards -->
+        <section class="dashboard-summary">
+          <div class="summary-card">
+            <div class="card-icon">📋</div>
+            <div class="card-content">
+              <div class="card-value"><%= stats.totalTasks %></div>
+              <div class="card-label">Total Tugas</div>
+            </div>
+          </div>
+
+          <div class="summary-card">
+            <div class="card-icon">🎯</div>
+            <div class="card-content">
+              <div class="card-value"><%= stats.highPriorityTasks %></div>
+              <div class="card-label">Prioritas Tinggi</div>
+            </div>
+          </div>
+
+          <div class="summary-card">
+            <div class="card-icon">✅</div>
+            <div class="card-content">
+              <div class="card-value"><%= stats.completedTasks %></div>
+              <div class="card-label">Selesai</div>
+            </div>
+          </div>
+
+          <div class="summary-card">
+            <div class="card-icon">📊</div>
+            <div class="card-content">
+              <div class="card-value"><%= stats.completionRate %>%</div>
+              <div class="card-label">Completion Rate</div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: <%= stats.completionRate %>%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="summary-card">
+            <div class="card-icon">⏱️</div>
+            <div class="card-content">
+              <div class="card-value"><%= stats.completedFocusSessions %></div>
+              <div class="card-label">Sesi Fokus Selesai</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Main Content Grid -->
+        <div class="dashboard-grid">
+          <!-- Recommendation Section -->
+          <section class="recommendation-card">
+            <h3>🎯 Rekomendasi Tugas Hari Ini</h3>
+            <% if (nextTask) { %>
+            <div class="task-recommendation">
+              <h4><%= nextTask.title %></h4>
+              <p class="course-name"><%= nextTask.courseName %></p>
+
+              <div class="priority-badge <%= nextTask.priorityCategory %>">
+                <%= nextTask.priorityCategory.replace(/_/g, " ").toUpperCase() %>
+              </div>
+
+              <div class="task-details">
+                <div class="detail-row">
+                  <span class="label">Deadline:</span>
+                  <span class="value"><%= new Date(nextTask.deadline).toLocaleDateString("id-ID") %></span>
+                </div>
+                <div class="detail-row">
+                  <span class="label">Estimasi Waktu:</span>
+                  <span class="value"><%= nextTask.estimatedHours %> jam</span>
+                </div>
+                <div class="detail-row">
+                  <span class="label">Skor Prioritas:</span>
+                  <span class="value"><%= nextTask.priorityScore %>/140</span>
+                </div>
+              </div>
+
+              <p class="recommendation-reason"><%= nextTask.priorityReason %></p>
+
+              <p class="recommendation-action">
+                <strong>💡 Aksi:</strong> <%= nextTask.actionRecommendation %>
+              </p>
+
+              <a href="/focus/<%= nextTask.id %>?userId=<%= user.id %>" class="btn btn-primary btn-full">
+                Mulai Sesi Fokus
+              </a>
+              <a href="/tasks/board/<%= user.id %>" class="btn btn-secondary btn-full">
+                Lihat Semua Tugas
+              </a>
+            </div>
+            <% } else { %>
+            <p class="empty-state">Belum ada tugas. Mari tambahkan tugas pertama Anda!</p>
+            <a href="/tasks/new/<%= user.id %>" class="btn btn-primary btn-full">Tambah Tugas Pertama</a>
+            <% } %>
+          </section>
+
+          <!-- Upcoming Deadlines Section -->
+          <section class="upcoming-deadlines-card">
+            <h3>📅 Deadline Terdekat</h3>
+            <% if (stats.upcomingDeadlines.length > 0) { %>
+            <div class="deadline-list">
+              <% stats.upcomingDeadlines.forEach(task => { %>
+              <div class="deadline-item">
+                <div class="deadline-info">
+                  <h5><%= task.title %></h5>
+                  <p class="course-name"><%= task.courseName %></p>
+                </div>
+                <div class="deadline-date">
+                  <%= new Date(task.deadline).toLocaleDateString("id-ID") %>
+                </div>
+              </div>
+              <% }); %>
+            </div>
+            <% } else { %>
+            <p class="empty-state">Tidak ada deadline yang mendesak.</p>
+            <% } %>
+          </section>
+
+          <!-- Statistics Section -->
+          <section class="statistics-card">
+            <h3>📈 Statistik Produktivitas</h3>
+            <div class="stats-content">
+              <div class="stat-item">
+                <div class="stat-label">Total Sesi Fokus</div>
+                <div class="stat-value"><%= stats.totalFocusSessions %></div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-label">Sesi Selesai</div>
+                <div class="stat-value"><%= stats.completedFocusSessions %></div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-label">Tugas Tersisa</div>
+                <div class="stat-value"><%= stats.remainingTasks %></div>
+              </div>
+            </div>
+
+            <a href="/tasks/board/<%= user.id %>" class="btn btn-secondary btn-full">Kelola Tugas</a>
+          </section>
+
+          <!-- Quick Actions -->
+          <section class="quick-actions-card">
+            <h3>⚡ Aksi Cepat</h3>
+            <div class="action-buttons">
+              <a href="/tasks/new/<%= user.id %>" class="action-btn">
+                <span>➕</span>
+                <span>Tambah Tugas</span>
+              </a>
+              <a href="/tasks/board/<%= user.id %>" class="action-btn">
+                <span>📋</span>
+                <span>Kelola Board</span>
+              </a>
+              <a href="/feedback/<%= user.id %>" class="action-btn">
+                <span>💬</span>
+                <span>Feedback</span>
+              </a>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <script src="/js/dashboard.js"></script>
+  </body>
+</html>

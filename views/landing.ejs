@@ -1,0 +1,218 @@
+<!-- views/landing.ejs -->
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TaskFocus Student - Platform Prioritas Tugas Kuliah</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+    <!-- Google Analytics 4 -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=<%= ga4_id %>"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "<%= ga4_id %>");
+    </script>
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="navbar">
+      <div class="container">
+        <div class="navbar-content">
+          <div class="navbar-brand">
+            <h1>TaskFocus Student</h1>
+          </div>
+          <ul class="navbar-menu">
+            <li><a href="#problem">Masalah</a></li>
+            <li><a href="#solution">Solusi</a></li>
+            <li><a href="#how-it-works">Cara Kerja</a></li>
+            <li><a href="#features">Fitur</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="container hero-content">
+        <h2>Kelola Tugas Kuliah Lebih Terarah, Fokus, dan Terukur.</h2>
+        <p class="subheadline">
+          TaskFocus Student membantu mahasiswa menentukan prioritas tugas berdasarkan deadline,
+          tingkat kesulitan, estimasi waktu, dan kepentingan akademik.
+        </p>
+        <div class="hero-cta">
+          <a href="/onboarding" class="btn btn-primary" onclick="trackCTA('cta_click')">
+            Mulai Atur Prioritas
+          </a>
+          <a href="#how-it-works" class="btn btn-secondary">Lihat Cara Kerja</a>
+        </div>
+        <p class="hero-subtext">Gratis untuk pengguna awal. Tidak perlu kartu kredit.</p>
+      </div>
+    </section>
+
+    <!-- Problem Section -->
+    <section class="problem-section" id="problem">
+      <div class="container">
+        <h3>Masalah yang Dihadapi Mahasiswa</h3>
+        <div class="problem-cards">
+          <div class="card problem-card">
+            <h4>📚 Banyak Tugas, Sedikit Waktu</h4>
+            <p>Deadline saling berdekatan membuat sulit menentukan prioritas pengerjaan.</p>
+          </div>
+          <div class="card problem-card">
+            <h4>🤔 Sulit Memutuskan Mana yang Dikerjakan Duluan</h4>
+            <p>Tanpa sistem prioritas, mahasiswa sering mengerjakan tugas yang tidak urgent terlebih dahulu.</p>
+          </div>
+          <div class="card problem-card">
+            <h4>😴 Sulit Mempertahankan Fokus</h4>
+            <p>Tanpa struktur sesi belajar, produktivitas menurun dan waktu terbuang.</p>
+          </div>
+          <div class="card problem-card">
+            <h4>📊 Tidak Ada Insight tentang Produktivitas</h4>
+            <p>Mahasiswa tidak tahu berapa banyak tugas yang sudah diselesaikan atau berapa fokus session yang efektif.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Solution Section -->
+    <section class="solution-section" id="solution">
+      <div class="container">
+        <h3>Solusi: TaskFocus Student</h3>
+        <p class="solution-intro">
+          TaskFocus Student membantu mengubah daftar tugas yang berantakan menjadi prioritas kerja yang lebih jelas,
+          terukur, dan mudah dijalankan.
+        </p>
+        <div class="solution-highlight">
+          <ul>
+            <li>✅ Scoring otomatis berdasarkan deadline, kesulitan, estimasi waktu, dan kepentingan</li>
+            <li>✅ Rekomendasi tugas prioritas dengan penjelasan natural</li>
+            <li>✅ Sesi fokus terukur dengan timer yang membantu konsentrasi</li>
+            <li>✅ Dashboard yang menampilkan progress dan productivity metrics</li>
+            <li>✅ Drag-and-drop task board untuk mengelola status tugas dengan mudah</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works-section" id="how-it-works">
+      <div class="container">
+        <h3>Bagaimana Cara Kerjanya?</h3>
+        <div class="steps">
+          <div class="step">
+            <div class="step-number">1</div>
+            <h4>Catat Tugas</h4>
+            <p>Tambahkan tugas dengan detail: deadline, kesulitan, estimasi waktu, dan kepentingan.</p>
+          </div>
+          <div class="step">
+            <div class="step-number">2</div>
+            <h4>Sistem Scoring Otomatis</h4>
+            <p>TaskFocus menghitung skor prioritas dan memberikan rekomendasi aksi yang jelas.</p>
+          </div>
+          <div class="step">
+            <div class="step-number">3</div>
+            <h4>Pilih Tugas Prioritas</h4>
+            <p>Lihat dashboard dengan rekomendasi tugas mana yang harus dikerjakan terlebih dahulu.</p>
+          </div>
+          <div class="step">
+            <div class="step-number">4</div>
+            <h4>Mulai Sesi Fokus</h4>
+            <p>Gunakan timer sesi fokus untuk menjaga konsentrasi dan produktivitas belajar.</p>
+          </div>
+          <div class="step">
+            <div class="step-number">5</div>
+            <h4>Lacak Progress</h4>
+            <p>Lihat dashboard menampilkan completion rate dan total sesi fokus yang sudah selesai.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section" id="features">
+      <div class="container">
+        <h3>Fitur-Fitur Utama</h3>
+        <div class="features-grid">
+          <div class="feature-card">
+            <h4>🎯 Priority Scoring</h4>
+            <p>Algoritma cerdas menentukan prioritas berdasarkan deadline, kesulitan, waktu, dan kepentingan.</p>
+          </div>
+          <div class="feature-card">
+            <h4>📋 Task Board</h4>
+            <p>Kelola tugas dengan drag-and-drop interface yang intuitif dan responsive.</p>
+          </div>
+          <div class="feature-card">
+            <h4>⏱️ Focus Session Timer</h4>
+            <p>Timer terpersonalisasi berdasarkan estimasi waktu task untuk mendukung deep work.</p>
+          </div>
+          <div class="feature-card">
+            <h4>📊 Dashboard Analytics</h4>
+            <p>Visualisasi progress, completion rate, dan total sesi fokus dalam satu dashboard.</p>
+          </div>
+          <div class="feature-card">
+            <h4>💡 Smart Recommendations</h4>
+            <p>Dapatkan rekomendasi tugas dan aksi yang dipersonalisasi setiap hari.</p>
+          </div>
+          <div class="feature-card">
+            <h4>📱 Mobile Responsive</h4>
+            <p>Akses dari desktop, tablet, atau mobile untuk fleksibilitas maksimal.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+      <div class="container">
+        <h3>Siap Produktif Lebih Baik?</h3>
+        <p>Bergabunglah dengan puluhan mahasiswa yang sudah menggunakan TaskFocus Student.</p>
+        <a href="/onboarding" class="btn btn-primary btn-large" onclick="trackCTA('cta_click_2')">
+          Mulai Atur Prioritas Sekarang
+        </a>
+      </div>
+    </section>
+
+    <!-- Waitlist Section -->
+    <section class="waitlist-section" id="waitlist">
+      <div class="container">
+        <h3>Ingin Update Produk Terbaru?</h3>
+        <p>Daftarkan email Anda untuk mendapatkan notifikasi fitur baru.</p>
+        <form class="waitlist-form" onsubmit="submitWaitlist(event)">
+          <input type="text" name="name" placeholder="Nama Anda" required />
+          <input type="email" name="email" placeholder="Email Anda" required />
+          <select name="preferredFeature">
+            <option value="">Pilih fitur yang diminati...</option>
+            <option value="reminder_deadline">Reminder Deadline</option>
+            <option value="integrasi_kalender">Integrasi Kalender</option>
+            <option value="dashboard_produktivitas">Dashboard Produktivitas Lanjutan</option>
+            <option value="rekomendasi_ai">Rekomendasi AI</option>
+            <option value="progress_report">Progress Report Mingguan</option>
+          </select>
+          <button type="submit" class="btn btn-primary">Gabung Waitlist</button>
+        </form>
+        <p class="waitlist-message" id="waitlist-message"></p>
+      </div>
+    </section>
+
+    <!-- Privacy Notice -->
+    <footer class="footer">
+      <div class="container">
+        <p class="privacy-notice">
+          <strong>Privacy Notice:</strong> TaskFocus Student hanya mengumpulkan data yang diperlukan untuk menyimpan
+          tugas, mengukur penggunaan fitur, dan meningkatkan pengalaman pengguna. Kami tidak meminta data sensitif
+          seperti password akun kampus, nilai akademik, dokumen pribadi, atau akses ke sistem akademik pengguna.
+        </p>
+        <p class="copyright">&copy; 2024 TaskFocus Student. Semua hak dilindungi.</p>
+      </div>
+    </footer>
+
+    <script src="/js/landing.js"></script>
+  </body>
+</html>
