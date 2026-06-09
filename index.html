@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TaskFocus Student — MVP Prioritas Tugas</title>
+  <style>
+    :root {
+      --bg: #f7f9fc;
+      --surface: #ffffff;
+      --text: #1c2a3a;
+      --muted: #5f7082;
+      --primary: #2f5bea;
+      --primary-dark: #2348bf;
+      --border: #dde5ef;
+      --success: #1f8f5f;
+      --warning: #b57700;
+      --danger: #b42318;
+      --shadow: 0 10px 30px rgba(12, 35, 64, 0.08);
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.6;
+    }
+
+    .container {
+      width: min(1100px, 92%);
+      margin: 0 auto;
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(247, 249, 252, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.85rem 0;
+    }
+
+    .brand {
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+
+    section { padding: 4rem 0; }
+
+    .hero { padding-top: 5rem; }
+
+    h1, h2, h3 { line-height: 1.25; margin-top: 0; }
+
+    h1 { font-size: clamp(1.9rem, 3.6vw, 3rem); margin-bottom: 1rem; }
+    h2 { font-size: clamp(1.4rem, 2.5vw, 2rem); margin-bottom: 0.8rem; }
+    p { color: var(--muted); margin-top: 0; }
+
+    .btn {
+      border: none;
+      border-radius: 999px;
+      padding: 0.78rem 1.2rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+    }
+
+    .btn-primary {
+      color: #fff;
+      background: var(--primary);
+      box-shadow: var(--shadow);
+    }
+
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+
+    .grid-two {
+      display: grid;
+      gap: 1.2rem;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.2rem;
+      box-shadow: var(--shadow);
+    }
+
+    ul { margin: 0; padding-left: 1.15rem; color: var(--muted); }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.9rem;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.92rem;
+      margin-bottom: 0.35rem;
+      color: var(--text);
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.75rem 0.82rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.96rem;
+      color: var(--text);
+      background: #fff;
+    }
+
+    input:focus, select:focus {
+      outline: 2px solid rgba(47, 91, 234, 0.25);
+      border-color: var(--primary);
+    }
+
+    .result {
+      display: none;
+      margin-top: 1rem;
+    }
+
+    .priority-high { color: var(--danger); }
+    .priority-medium { color: var(--warning); }
+    .priority-low { color: var(--success); }
+
+    .meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 0.75rem;
+      margin: 1rem 0;
+    }
+
+    .meta div {
+      background: #f3f6fb;
+      padding: 0.75rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    .small { font-size: 0.9rem; color: var(--muted); }
+
+    footer {
+      padding: 2rem 0 3rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    @media (max-width: 680px) {
+      section { padding: 3rem 0; }
+      .hero { padding-top: 3.8rem; }
+    }
+  </style>
+
+  <!-- GA4 base script (gunakan Measurement ID asli saat produksi) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    // Inisialisasi GA4 untuk tracking funnel MVP Data Driven Entrepreneurship
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+  </script>
+</head>
+<body>
+  <nav>
+    <div class="container nav-inner">
+      <div class="brand">TaskFocus Student</div>
+    </div>
+  </nav>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <h1>Stop bingung mulai dari mana. Prioritaskan tugas kuliah dengan lebih cerdas.</h1>
+        <p>TaskFocus Student membantu kamu memilih tugas paling mendesak dan penting, lalu memberi rekomendasi sesi fokus belajar yang sesuai kondisi fokusmu saat ini.</p>
+        <button id="ctaPriority" class="btn btn-primary">Atur Prioritas Tugas</button>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <h2>Tantangan Mahasiswa Hari Ini</h2>
+        <div class="grid-two">
+          <div class="card"><strong>Deadline menumpuk</strong><p>Tugas dari berbagai mata kuliah datang bersamaan dan sulit dipetakan prioritasnya.</p></div>
+          <div class="card"><strong>Bingung mulai dari mana</strong><p>Semua terasa penting, tapi waktu dan energi tidak selalu cukup.</p></div>
+          <div class="card"><strong>Sulit menjaga fokus</strong><p>Niatan belajar ada, namun sulit bertahan fokus dalam durasi yang tepat.</p></div>
+          <div class="card"><strong>Tugas saling bertabrakan</strong><p>Estimasi pengerjaan tidak sinkron dengan jadwal kuliah dan aktivitas harian.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <h2>Solusi dari TaskFocus Student</h2>
+        <p>Dengan input sederhana, sistem menghitung skor prioritas tugas berbasis deadline, kesulitan, estimasi waktu, kepentingan, serta kondisi fokus. Hasilnya: rekomendasi aksi yang lebih jelas dan realistis.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <h2>How It Works</h2>
+        <div class="grid-two">
+          <div class="card"><h3>1) Input data tugas</h3><p>Isi data penting tugas yang sedang kamu hadapi.</p></div>
+          <div class="card"><h3>2) Sistem menghitung prioritas</h3><p>Skor dihitung berdasarkan aturan sederhana dan transparan.</p></div>
+          <div class="card"><h3>3) Lihat rekomendasi</h3><p>Dapatkan prioritas, waktu pengerjaan, dan alasan singkatnya.</p></div>
+          <div class="card"><h3>4) Mulai sesi fokus</h3><p>Jalankan sesi fokus sesuai stamina mentalmu saat ini.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="task-form-section">
+      <div class="container">
+        <h2>Form Input Tugas</h2>
+        <div class="card">
+          <form id="taskForm">
+            <div class="form-grid">
+              <div>
+                <label for="taskName">Nama tugas</label>
+                <input id="taskName" name="taskName" required />
+              </div>
+              <div>
+                <label for="courseName">Mata kuliah</label>
+                <input id="courseName" name="courseName" required />
+              </div>
+              <div>
+                <label for="deadline">Deadline</label>
+                <input id="deadline" name="deadline" type="date" required />
+              </div>
+              <div>
+                <label for="difficulty">Tingkat kesulitan</label>
+                <select id="difficulty" name="difficulty" required>
+                  <option value="rendah">Rendah</option>
+                  <option value="sedang">Sedang</option>
+                  <option value="tinggi">Tinggi</option>
+                </select>
+              </div>
+              <div>
+                <label for="estimate">Estimasi waktu (jam)</label>
+                <input id="estimate" name="estimate" type="number" min="0.1" step="0.1" required />
+              </div>
+              <div>
+                <label for="importance">Tingkat kepentingan</label>
+                <select id="importance" name="importance" required>
+                  <option value="rendah">Rendah</option>
+                  <option value="sedang">Sedang</option>
+                  <option value="tinggi">Tinggi</option>
+                </select>
+              </div>
+              <div>
+                <label for="focus">Kondisi fokus saat ini</label>
+                <select id="focus" name="focus" required>
+                  <option value="rendah">Rendah</option>
+                  <option value="sedang">Sedang</option>
+                  <option value="tinggi">Tinggi</option>
+                </select>
+              </div>
+            </div>
+            <div style="margin-top:1rem;">
+              <button type="submit" class="btn btn-primary">Hitung Rekomendasi</button>
+            </div>
+          </form>
+
+          <div id="resultCard" class="result card" aria-live="polite">
+            <h3>Hasil Rekomendasi</h3>
+            <div class="meta">
+              <div><strong>Skor prioritas</strong><br><span id="scoreText"></span></div>
+              <div><strong>Kategori</strong><br><span id="categoryText"></span></div>
+              <div><strong>Waktu pengerjaan</strong><br><span id="scheduleText"></span></div>
+              <div><strong>Sesi fokus</strong><br><span id="focusText"></span></div>
+            </div>
+            <p><strong>Alasan prioritas:</strong> <span id="reasonText"></span></p>
+            <button id="startFocusBtn" class="btn btn-primary" type="button">Mulai Sesi Fokus</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <h2>Gabung Waitlist</h2>
+        <div class="card">
+          <form id="waitlistForm" class="form-grid">
+            <div>
+              <label for="waitlistName">Nama</label>
+              <input id="waitlistName" name="waitlistName" required />
+            </div>
+            <div>
+              <label for="waitlistEmail">Email</label>
+              <input id="waitlistEmail" name="waitlistEmail" type="email" required />
+            </div>
+            <div style="align-self:end;">
+              <button type="submit" class="btn btn-primary">Gabung Waitlist</button>
+            </div>
+          </form>
+          <p id="waitlistMessage" class="small"></p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <h2>Privacy Notice</h2>
+        <p class="small">Data yang diinput pada MVP ini digunakan hanya untuk validasi akademik, analisis perilaku pengguna, dan pengembangan produk awal. Kami tidak meminta data sensitif.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    TaskFocus Student · MVP Data Driven Entrepreneurship
+  </footer>
+
+  <script>
+    const ctaPriority = document.getElementById('ctaPriority');
+    const taskFormSection = document.getElementById('task-form-section');
+    const taskForm = document.getElementById('taskForm');
+    const resultCard = document.getElementById('resultCard');
+    const startFocusBtn = document.getElementById('startFocusBtn');
+    const waitlistForm = document.getElementById('waitlistForm');
+    const waitlistMessage = document.getElementById('waitlistMessage');
+
+    const scoreText = document.getElementById('scoreText');
+    const categoryText = document.getElementById('categoryText');
+    const scheduleText = document.getElementById('scheduleText');
+    const focusText = document.getElementById('focusText');
+    const reasonText = document.getElementById('reasonText');
+
+    let formStartedTracked = false;
+
+    const difficultyScore = { rendah: 10, sedang: 20, tinggi: 30 };
+    const importanceScore = { rendah: 10, sedang: 20, tinggi: 30 };
+    const focusSession = { rendah: 25, sedang: 50, tinggi: 90 };
+
+    function dayDiffFromNow(dateValue) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const deadline = new Date(dateValue + 'T00:00:00');
+      const diffMs = deadline - today;
+      return Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+    }
+
+    function deadlineScore(days) {
+      if (days <= 1) return 40;
+      if (days <= 3) return 30;
+      if (days <= 7) return 20;
+      return 10;
+    }
+
+    function estimateScore(hours) {
+      if (hours > 5) return 20;
+      if (hours >= 2) return 10;
+      return 5;
+    }
+
+    function categoryByScore(score) {
+      if (score >= 90) return { label: 'Prioritas tinggi', css: 'priority-high' };
+      if (score >= 60) return { label: 'Prioritas sedang', css: 'priority-medium' };
+      return { label: 'Prioritas rendah', css: 'priority-low' };
+    }
+
+    function scheduleSuggestion(days) {
+      if (days <= 1) return 'Kerjakan hari ini, idealnya dalam 6-12 jam ke depan.';
+      if (days <= 3) return 'Jadwalkan pengerjaan dalam 24 jam ke depan.';
+      if (days <= 7) return 'Mulai dalam 1-2 hari ke depan agar tidak menumpuk.';
+      return 'Buat slot belajar terjadwal minggu ini.';
+    }
+
+    // GA4 event: cta_click saat tombol hero diklik
+    ctaPriority.addEventListener('click', () => {
+      gtag('event', 'cta_click', { cta_name: 'Atur Prioritas Tugas' });
+      taskFormSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    // GA4 event: task_form_start dipanggil sekali saat user mulai isi form tugas
+    taskForm.addEventListener('input', () => {
+      if (!formStartedTracked) {
+        formStartedTracked = true;
+        gtag('event', 'task_form_start', { form_name: 'task_priority_form' });
+      }
+    });
+
+    // GA4 event: task_form_submit + recommendation_view saat hasil ditampilkan
+    taskForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(taskForm);
+      const taskName = formData.get('taskName');
+      const courseName = formData.get('courseName');
+      const deadline = formData.get('deadline');
+      const difficulty = formData.get('difficulty');
+      const estimate = parseFloat(formData.get('estimate'));
+      const importance = formData.get('importance');
+      const focus = formData.get('focus');
+
+      const days = dayDiffFromNow(deadline);
+      const score = deadlineScore(days) + difficultyScore[difficulty] + estimateScore(estimate) + importanceScore[importance];
+      const category = categoryByScore(score);
+      const session = focusSession[focus];
+
+      const reasons = [
+        `Deadline ${days <= 1 ? 'sangat dekat' : `${days} hari lagi`}`,
+        `tingkat kesulitan ${difficulty}`,
+        `estimasi ${estimate} jam`,
+        `kepentingan ${importance}`
+      ];
+
+      scoreText.textContent = `${score} poin`;
+      categoryText.textContent = category.label;
+      categoryText.className = category.css;
+      scheduleText.textContent = scheduleSuggestion(days);
+      focusText.textContent = `${session} menit`;
+      reasonText.textContent = `Tugas "${taskName}" (${courseName}) diprioritaskan karena ${reasons.join(', ')}.`;
+
+      resultCard.style.display = 'block';
+      resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+      gtag('event', 'task_form_submit', { task_name: taskName, course_name: courseName, priority_score: score });
+      gtag('event', 'recommendation_view', { priority_category: category.label, focus_duration: session });
+    });
+
+    // GA4 event: focus_session_click saat user memulai sesi fokus
+    startFocusBtn.addEventListener('click', () => {
+      const selectedFocus = document.getElementById('focus').value;
+      const session = focusSession[selectedFocus];
+      gtag('event', 'focus_session_click', { focus_duration: session });
+      alert(`Sesi fokus ${session} menit dimulai. Semangat belajar!`);
+    });
+
+    // GA4 event: waitlist_submit saat form waitlist dikirim
+    waitlistForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('waitlistName').value.trim();
+      const email = document.getElementById('waitlistEmail').value.trim();
+      gtag('event', 'waitlist_submit', { user_name: name, user_email_domain: email.split('@')[1] || 'unknown' });
+      waitlistMessage.textContent = `Terima kasih, ${name}! Kamu sudah masuk waitlist TaskFocus Student.`;
+      waitlistForm.reset();
+    });
+  </script>
+</body>
+</html>
